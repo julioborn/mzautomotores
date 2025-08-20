@@ -12,24 +12,13 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   themeColor: "#dc2626",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "MZ Automotores",
-  },
-  icons: {
-    icon: "/images/mzlogo.png",
-    apple: "/images/mzlogo.png",
-  },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "MZ Automotores" },
+  icons: { icon: "/images/mzlogo.png", apple: "/images/mzlogo.png" },
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <head>
         <meta name="application-name" content="MZ Automotores" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -41,26 +30,12 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
         <link rel="apple-touch-icon" href="/images/mzlogo.png" />
         <link rel="manifest" href="/manifest.json" />
-
         <link rel="preload" href="/images/mzlogo.png" as="image" />
         <link rel="dns-prefetch" href="//wa.me" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-        <style>{`
-html {
-  font-family: ${GeistSans.style.fontFamily};
-  --font-sans: ${GeistSans.variable};
-  --font-mono: ${GeistMono.variable};
-}
-/* Font display optimization */
-@font-face {
-  font-family: '${GeistSans.style.fontFamily}';
-  font-display: swap;
-}
-        `}</style>
       </head>
-      <body className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+      <body className="antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
