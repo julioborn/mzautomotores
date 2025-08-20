@@ -1,0 +1,27 @@
+{
+  "name": "MZ Automotores",
+  "short_name": "MZ Auto",
+  "description": "Concesionaria de vehículos - Encuentra tu próximo auto",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["automotive", "business"],
+  "lang": "es",
+  "dir": "ltr"
+}
