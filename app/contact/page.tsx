@@ -36,36 +36,6 @@ Mensaje: ${formData.message}`
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-red-50/30 to-blue-50">
-      {/* Header */}
-      <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-red-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24 sm:h-32">
-            <Link href="/" className="flex items-center">
-              <Image
-                src="/images/mzlogo.png"
-                alt="MZ Automotores"
-                width={100}
-                height={38}
-                className="h-14 sm:h-20 w-auto"
-                priority
-              />
-              <h1 className="text-lg sm:text-xl font-bold text-black ml-2">MZ Automotores</h1>
-            </Link>
-            <nav className="flex items-center gap-4">
-              <Link href="/vehicles">
-                <Button variant="ghost" className="text-slate-700 hover:text-red-600 hover:bg-red-50">
-                  Vehículos
-                </Button>
-              </Link>
-              <Link href="/">
-                <Button variant="ghost" className="text-slate-700 hover:text-red-600 hover:bg-red-50">
-                  Inicio
-                </Button>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">

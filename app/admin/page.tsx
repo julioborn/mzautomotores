@@ -123,46 +123,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50/30 via-slate-50 to-slate-100">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-24 sm:h-32">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/images/mzlogo.png"
-                alt="MZ Automotores"
-                width={100}
-                height={38}
-                className="h-14 sm:h-20 w-auto"
-                priority
-              />
-              <h1 className="text-base sm:text-lg font-bold text-black">Panel de Administración</h1>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Link href="/" prefetch={true}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs sm:text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100"
-                >
-                  <span className="hidden sm:inline">Ver Sitio Público</span>
-                  <span className="sm:hidden">Sitio</span>
-                </Button>
-              </Link>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-                className="text-xs sm:text-sm bg-transparent border-slate-200 text-slate-700 hover:bg-slate-50"
-              >
-                <LogOut className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Cerrar Sesión</span>
-                <span className="sm:hidden">Salir</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
@@ -183,7 +143,7 @@ export default function AdminPage() {
         <div className="grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 mb-8">
           <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium text-slate-600">Vehículos totales</CardTitle>
+              <CardTitle className="text-xs sm:text-sm font-medium text-slate-600">Vehículos</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-lg sm:text-2xl font-bold text-black">{stats.total}</div>

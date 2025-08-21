@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
+import SiteHeader from "@/components/site-header" // ⬅️ nuevo header común
 
 export const metadata: Metadata = {
   title: "MZ Automotores",
@@ -36,7 +37,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body className="antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <SiteHeader />
+          {/* Padding top para que el contenido no quede debajo del header sticky */}
+          <div className="pt-4 sm:pt-6">
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )
