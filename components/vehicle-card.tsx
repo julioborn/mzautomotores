@@ -10,11 +10,9 @@ import { ChevronLeft, ChevronRight, Gauge, Settings, Fuel, Zap } from "lucide-re
 import { useState } from "react"
 import { DEALERSHIP_OWNER } from "@/lib/constants"
 
-interface VehicleCardProps {
-  vehicle: Vehicle
-}
+export type VehicleCardProps = { vehicle: Vehicle }
 
-export function VehicleCard({ vehicle }: VehicleCardProps) {
+export default function VehicleCard({ vehicle }: VehicleCardProps) {                     
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [imageError, setImageError] = useState<boolean[]>([])
 

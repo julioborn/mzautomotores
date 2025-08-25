@@ -45,13 +45,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br flex justify-center p-4">
       <div className="w-full max-w-md">
+        
         {/* Header */}
-        <div className="text-center mb-8">
-          <p className="text-gray-600">Panel de Administración</p>
-        </div>
-
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -92,7 +89,7 @@ export default function LoginPage() {
                 </Alert>
               )}
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-red-700 hover:bg-red-800 cursor-pointer" disabled={isLoading}>
                 {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
               </Button>
             </form>
@@ -106,7 +103,7 @@ export default function LoginPage() {
         </Card>
 
         <div className="text-center mt-6">
-          <Link href="/" className="text-red-800 hover:text-red-900 text-sm">
+          <Link href="/" className="rounded-md bg-white border p-2 text-red-700 hover:text-red-800 text-sm">
             ← Volver al inicio
           </Link>
         </div>

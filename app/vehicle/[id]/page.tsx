@@ -109,70 +109,80 @@ export default function VehiclePage() {
           {/* Image Gallery */}
           <Card className="mb-6 sm:mb-8 overflow-hidden border-slate-200">
             <div className="relative">
-              <div className="relative w-full h-64 sm:h-96">
+              {/* Contenedor principal de la imagen */}
+              <div className="relative w-full h-[55vh] sm:h-[65vh] max-h-[780px] bg-slate-900">
                 <Image
                   src={images[currentImageIndex] || "/placeholder.svg"}
                   alt={`${vehicle.brand} ${vehicle.model}`}
                   fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1024px"
+                  className="object-contain"              // 👈 muestra la imagen completa
+                  sizes="100vw"
                   priority={currentImageIndex === 0}
                   quality={90}
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                 />
               </div>
 
-              {/* Price Badge */}
-              {vehicle.showPrice && (
+              {/* Badge de precio */}
+              {vehicle.showPrice ? (
                 <div className="absolute top-4 right-4">
-                  <Badge className="bg-red-600 text-white text-lg sm:text-xl font-bold px-3 py-1">
+                  <Badge className="bg-red-600 text-white text-lg sm:text-xl font-bold px-3 py-1 shadow">
                     ${vehicle.price.toLocaleString()} {vehicle.currency || "ARS"}
                   </Badge>
                 </div>
-              )}
-
-              {!vehicle.showPrice && (
+              ) : (
                 <div className="absolute top-4 right-4">
-                  <Badge className="bg-gray-600 text-white text-lg sm:text-xl font-bold px-3 py-1">
+                  <Badge className="bg-gray-700 text-white text-lg sm:text-xl font-bold px-3 py-1 shadow">
                     Consultar precio
                   </Badge>
                 </div>
               )}
 
-              {/* Navigation arrows */}
+              {/* Flechas */}
               {images.length > 1 && (
                 <>
                   <button
                     onClick={goToPrevious}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2"
+                    aria-label="Anterior"
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <button
                     onClick={goToNext}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2"
+                    aria-label="Siguiente"
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>
                 </>
               )}
+            </div>
 
-              {/* Image indicators */}
-              {images.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                  {images.map((_, index) => (
+            {/* Thumbnails */}
+            {images.length > 1 && (
+              <div className="px-3 pb-4 pt-3">
+                <div className="flex gap-2 overflow-x-auto scrollbar-none">
+                  {images.map((src, idx) => (
                     <button
-                      key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`w-3 h-3 rounded-full transition-colors ${
-                        index === currentImageIndex ? "bg-white" : "bg-white/50"
-                      }`}
-                    />
+                      key={src + idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`relative h-16 sm:h-20 w-24 sm:w-28 rounded border ${idx === currentImageIndex ? "border-slate-900" : "border-slate-200"
+                        } bg-white flex-shrink-0`}
+                      aria-label={`Ver imagen ${idx + 1}`}
+                    >
+                      <Image
+                        src={src}
+                        alt={`Imagen ${idx + 1}`}
+                        fill
+                        className="object-cover rounded"   // acá sí puede convenir cover en miniatura
+                        sizes="112px"
+                        loading="lazy"
+                      />
+                    </button>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </Card>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -235,8 +245,12 @@ export default function VehiclePage() {
               {/* Info */}
               <Card className="border-slate-200">
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-black mb-4">Más Detalles</h3>
-                  {vehicle.description && <p className="text-gray-700 leading-relaxed">{vehicle.description}</p>}
+                  <h3 className="text-xl font-semibold text-black mb-4">Más detalles</h3>
+                  {vehicle.description && vehicle.description.trim() !== "" ? (
+                    <p className="text-gray-700 leading-relaxed">{vehicle.description}</p>
+                  ) : (
+                    <p className="text-gray-500">No hay detalles adicionales para este vehículo.</p>
+                  )}
                 </CardContent>
               </Card>
             </div>

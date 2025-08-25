@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useMemo, useCallback, useDeferredValue } from "react"
+import { useState, useEffect, useMemo, useCallback, useDeferredValue, ComponentType } from "react"
 import dynamic from "next/dynamic"
 import { getPublicVehicles } from "@/lib/vehicles"
 import type { Vehicle } from "@/types/vehicle"
@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Car, Search, MessageCircle, Menu, X, ChevronLeft, ChevronRight } from "lucide-react"
+import { Car, Search, MessageCircle, Menu, X, ChevronLeft, ChevronRight, Phone } from "lucide-react"
+import { VehicleCardProps } from "./vehicle-card"
 
 type SortKey = "newest" | "oldest" | "price-low" | "price-high" | "mileage-low"
 
-const VehicleCard = dynamic(
-    () => import("@/components/vehicle-card").then((m) => m.VehicleCard),
+const VehicleCard = dynamic<VehicleCardProps>(
+    () => import("@/components/vehicle-card").then((m) => m.default),
     { loading: () => <div className="h-64 rounded-lg bg-slate-100 animate-pulse" /> }
 )
 
@@ -372,6 +372,39 @@ export function VehicleExplorer({ initialVehicles }: Props) {
                     </div>
                 </>
             )}
+
+            {/* CTA (ahora dentro del explorer, solo aparece cuando no loading/error) */}
+            <div className="mt-12 sm:mt-16 text-center">
+                <Card className="bg-gradient-to-br from-slate-50 to-blue-50 border-slate-200 shadow-sm">
+                    <CardContent className="py-6 sm:py-8 px-4 sm:px-6">
+                        <h3 className="text-xl sm:text-2xl font-bold text-black mb-3 sm:mb-4">
+                            ¿No encontraste lo que buscás?
+                        </h3>
+                        <p className="text-slate-600 mb-4 sm:mb-6 text-sm sm:text-base">
+                            Contactanos y te ayudamos a encontrar el vehículo perfecto.
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                            <Button
+                                size="lg"
+                                onClick={() => window.open("https://wa.me/3483529702", "_blank")}
+                                className="bg-green-600 hover:bg-green-700"
+                            >
+                                <MessageCircle className="h-5 w-5 mr-2" />
+                                WhatsApp
+                            </Button>
+                            <Button
+                                size="lg"
+                                variant="outline"
+                                onClick={() => window.open("tel:+3483529702", "_blank")}
+                                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                            >
+                                <Phone className="h-5 w-5 mr-2" />
+                                Llamar
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     )
 }

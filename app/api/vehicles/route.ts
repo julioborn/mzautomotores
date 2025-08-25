@@ -2,7 +2,10 @@ import { type NextRequest, NextResponse } from "next/server"
 import { connectToDatabase } from "@/lib/mongodb"
 import Vehicle from "@/models/Vehicle"
 import { verifyToken } from "@/lib/jwt"
+import mongoose from "mongoose"
+import { normalizeError } from "@/utils/errors"
 
+// GET
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase()
@@ -10,26 +13,24 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const publicOnly = searchParams.get("public") === "true"
 
-    let query = {}
-    if (publicOnly) {
-      query = { isPublic: true }
-    }
-
+    const query = publicOnly ? { isPublic: true } : {}
     const vehicles = await Vehicle.find(query).sort({ createdAt: -1 })
 
-    const transformedVehicles = vehicles.map((vehicle) => ({
-      ...vehicle.toObject(),
-      id: vehicle._id.toString(),
+    const transformed = vehicles.map((v) => ({
+      ...v.toObject(),
+      id: v._id.toString(),
       _id: undefined,
     }))
 
-    return NextResponse.json(transformedVehicles)
-  } catch (error) {
-    console.error("Get vehicles error:", error)
+    return NextResponse.json(transformed)
+  } catch (err: unknown) {
+    const e = normalizeError(err)
+    console.error("Get vehicles error:", e)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
 
+// POST
 export async function POST(request: NextRequest) {
   try {
     console.log("[v0] POST /api/vehicles - Starting request")
@@ -40,13 +41,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
-    const decoded = verifyToken(token)
-    if (!decoded) {
+    let decoded: unknown
+    try {
+      decoded = verifyToken(token)
+    } catch (e) {
       console.log("[v0] Invalid token")
       return NextResponse.json({ error: "Invalid token" }, { status: 401 })
     }
-
-    console.log("[v0] User authenticated:", decoded.userId)
 
     await connectToDatabase()
     console.log("[v0] Connected to database")
@@ -65,26 +66,16 @@ export async function POST(request: NextRequest) {
     await vehicle.save()
     console.log("[v0] Vehicle saved successfully:", vehicle._id)
 
-    const transformedVehicle = {
-      ...vehicle.toObject(),
-      id: vehicle._id.toString(),
-      _id: undefined,
-    }
+    const transformed = { ...vehicle.toObject(), id: vehicle._id.toString(), _id: undefined }
+    return NextResponse.json(transformed, { status: 201 })
+  } catch (err: unknown) {
+    const e = normalizeError(err)
+    console.error("[v0] Create vehicle error details:", e)
 
-    return NextResponse.json(transformedVehicle, { status: 201 })
-  } catch (error) {
-    console.error("[v0] Create vehicle error details:", {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-    })
-
-    if (error.name === "ValidationError") {
+    // Validación de Mongoose
+    if (err instanceof mongoose.Error.ValidationError) {
       return NextResponse.json(
-        {
-          error: "Validation error",
-          details: error.message,
-        },
+        { error: "Validation error", details: err.message },
         { status: 400 },
       )
     }

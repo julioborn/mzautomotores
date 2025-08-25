@@ -93,6 +93,11 @@ export default function SiteHeader() {
                             </Link>
                         ))}
 
+                        <Button onClick={handleWhatsApp} size="sm" className="bg-green-600 hover:bg-green-700">
+                            <MessageCircle className="h-4 w-4" />
+                            WhatsApp
+                        </Button>
+
                         {user ? (
                             <Button
                                 variant="outline"
@@ -112,10 +117,6 @@ export default function SiteHeader() {
                             </Link>
                         )}
 
-                        <Button onClick={handleWhatsApp} size="sm" className="bg-green-600 hover:bg-green-700">
-                            <MessageCircle className="h-4 w-4" />
-                            WhatsApp
-                        </Button>
                     </nav>
 
                     {/* Mobile menu */}
