@@ -567,7 +567,7 @@ export function VehicleForm({ vehicle, onClose }: VehicleFormProps) {
                   id="contactPhone"
                   value={formData.contactPhone}
                   onChange={(e) => setFormData((prev) => ({ ...prev, contactPhone: e.target.value }))}
-                  placeholder="+1234567890"
+                  placeholder="+3483529702"
                   required
                 />
               </div>

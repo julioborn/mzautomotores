@@ -21,8 +21,8 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
     { href: "/", label: "Inicio", icon: <Home className="h-4 w-4" />, auth: "any", exact: true },
-    { href: "/contact", label: "Contacto", icon: <Phone className="h-4 w-4" />, auth: "any" },
-    { href: "/admin", label: "Panel Admin", icon: <Shield className="h-4 w-4" />, auth: "private" },
+    // { href: "/contact", label: "Contacto", icon: <Phone className="h-4 w-4" />, auth: "any" },
+    { href: "/admin", label: "Administración", icon: <Shield className="h-4 w-4" />, auth: "private" },
 ]
 
 export default function SiteHeader() {
@@ -57,12 +57,12 @@ export default function SiteHeader() {
     }, [logout, router])
 
     const handleWhatsApp = useCallback(() => {
-        const phone = DEALERSHIP_OWNER?.whatsapp ?? "1234567890"
+        const phone = DEALERSHIP_OWNER?.whatsapp ?? "3483529702"
         window.open(`https://wa.me/${phone}`, "_blank")
     }, [])
 
     return (
-        <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
+        <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="h-20 sm:h-24 flex items-center justify-between">
                     {/* Brand */}
@@ -70,9 +70,9 @@ export default function SiteHeader() {
                         <Image
                             src="/images/mzlogo.png"
                             alt="MZ Automotores"
-                            width={120}
-                            height={48}
-                            className="h-14 sm:h-16 w-auto"
+                            width={290}  // aumentamos el ancho base
+                            height={72} // aumentamos el alto base
+                            className="h-16 sm:h-22 w-auto transition-all duration-300"
                             priority
                         />
                         <span className="sr-only">Ir a inicio</span>
@@ -87,7 +87,7 @@ export default function SiteHeader() {
                                     className={isActive(item) ? "bg-slate-900 text-white" : "text-slate-700 hover:text-slate-900"}
                                     size="sm"
                                 >
-                                    {item.icon && <span className="mr-2">{item.icon}</span>}
+                                    {item.icon && <span className="">{item.icon}</span>}
                                     {item.label}
                                 </Button>
                             </Link>
@@ -98,22 +98,22 @@ export default function SiteHeader() {
                                 variant="outline"
                                 size="sm"
                                 onClick={handleLogout}
-                                className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                                className="border-slate-300 bg-red-700 text-white hover:bg-red-800 hover:text-white"
                             >
-                                <LogOut className="h-4 w-4 mr-2" />
+                                <LogOut className="h-4 w-4" />
                                 Cerrar sesión
                             </Button>
                         ) : (
                             <Link href="/login" prefetch={true}>
                                 <Button size="sm" className="bg-slate-900 text-white hover:bg-slate-800">
-                                    <User className="h-4 w-4 mr-2" />
+                                    <User className="h-4 w-4" />
                                     Iniciar sesión
                                 </Button>
                             </Link>
                         )}
 
                         <Button onClick={handleWhatsApp} size="sm" className="bg-green-600 hover:bg-green-700">
-                            <MessageCircle className="h-4 w-4 mr-2" />
+                            <MessageCircle className="h-4 w-4" />
                             WhatsApp
                         </Button>
                     </nav>
@@ -149,16 +149,18 @@ export default function SiteHeader() {
 
                                     <Separator className="my-2" />
 
+                                    <Button onClick={handleWhatsApp} className="w-full justify-start bg-green-600 hover:bg-green-700">
+                                        <MessageCircle className="h-4 w-4 mr-2" />
+                                        WhatsApp
+                                    </Button>
                                     {user ? (
                                         <Button
                                             variant="outline"
-                                            onClick={() => {
-                                                setOpen(false)
-                                                handleLogout()
-                                            }}
-                                            className="justify-start border-slate-300"
+                                            size="lg"
+                                            onClick={handleLogout}
+                                            className="justify-start border-slate-300 bg-red-700 text-white hover:bg-red-800 hover:text-white"
                                         >
-                                            <LogOut className="h-4 w-4 mr-2" />
+                                            <LogOut className="h-4 w-4" />
                                             Cerrar sesión
                                         </Button>
                                     ) : (
@@ -170,10 +172,6 @@ export default function SiteHeader() {
                                         </Link>
                                     )}
 
-                                    <Button onClick={handleWhatsApp} className="w-full justify-start bg-green-600 hover:bg-green-700">
-                                        <MessageCircle className="h-4 w-4 mr-2" />
-                                        WhatsApp
-                                    </Button>
                                 </div>
                             </SheetContent>
                         </Sheet>

@@ -3,34 +3,46 @@
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useCallback, useMemo } from "react"
-import { getVehicles } from "@/lib/vehicles"
+import { getVehicles, updateVehicle, deleteVehicle } from "@/lib/vehicles"
 import type { Vehicle } from "@/types/vehicle"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Car, Plus, LogOut, Eye, EyeOff, Edit, Trash2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+import { Car, Plus, LogOut, Eye, EyeOff, Edit, Trash2, Search, Menu, X, ChevronLeft, ChevronRight, Filter } from "lucide-react"
 import Link from "next/link"
-import { VehicleForm } from "@/components/vehicle-form"
-import { deleteVehicle, updateVehicle } from "@/lib/vehicles"
 import Image from "next/image"
+import { VehicleForm } from "@/components/vehicle-form"
+
+type SortKey = "newest" | "oldest" | "price-low" | "price-high" | "mileage-low"
 
 export default function AdminPage() {
   const { user, logout } = useAuth()
   const router = useRouter()
+
   const [vehicles, setVehicles] = useState<Vehicle[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // ---- buscador / filtros / paginación (igual que público) ----
+  const [searchTerm, setSearchTerm] = useState("")
+  const [brandFilter, setBrandFilter] = useState("all")
+  const [sortBy, setSortBy] = useState<SortKey>("newest")
+  const [showFilters, setShowFilters] = useState(true) // en mobile visible por defecto
+  const [currentPage, setCurrentPage] = useState(1)
+  const [vehiclesPerPage, setVehiclesPerPage] = useState(6)
+
   const loadVehicles = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
-
-      const vehiclesData = await getVehicles()
-      const vehicleArray = Array.isArray(vehiclesData) ? vehiclesData : []
-      setVehicles(vehicleArray)
+      const data = await getVehicles()
+      setVehicles(Array.isArray(data) ? data : [])
     } catch (err) {
       console.error("Error loading vehicles:", err)
       setError("Error al cargar los vehículos")
@@ -45,7 +57,6 @@ export default function AdminPage() {
       router.push("/login")
       return
     }
-
     loadVehicles()
   }, [user, router, loadVehicles])
 
@@ -91,24 +102,75 @@ export default function AdminPage() {
     (hasChanges?: boolean) => {
       setShowForm(false)
       setEditingVehicle(null)
-      if (hasChanges) {
-        loadVehicles()
-      }
+      if (hasChanges) loadVehicles()
     },
     [loadVehicles],
   )
 
   const stats = useMemo(() => {
-    const total = Array.isArray(vehicles) ? vehicles.length : 0
-    const publicCount = Array.isArray(vehicles) ? vehicles.filter((v) => v.isPublic).length : 0
+    const total = vehicles.length
+    const publicCount = vehicles.filter((v) => v.isPublic).length
     const privateCount = total - publicCount
-
     return { total, publicCount, privateCount }
   }, [vehicles])
 
-  if (!user) {
-    return <div>Cargando...</div>
-  }
+  // ---- brands únicas para filtro ----
+  const brands = useMemo(() => {
+    const set = new Set(vehicles.map((v) => v.brand).filter(Boolean))
+    return Array.from(set).sort()
+  }, [vehicles])
+
+  // ---- aplicar búsqueda + filtros + sort ----
+  const filteredVehicles = useMemo(() => {
+    const low = searchTerm.trim().toLowerCase()
+    const filtered = vehicles.filter((v) => {
+      const matchesSearch =
+        !low ||
+        v.brand.toLowerCase().includes(low) ||
+        v.model.toLowerCase().includes(low) ||
+        String(v.year).includes(low)
+
+      const matchesBrand = brandFilter === "all" || v.brand === brandFilter
+      return matchesSearch && matchesBrand
+    })
+
+    const sorted = [...filtered]
+    switch (sortBy) {
+      case "newest":
+        sorted.sort((a, b) => b.year - a.year)
+        break
+      case "oldest":
+        sorted.sort((a, b) => a.year - b.year)
+        break
+      case "price-low":
+        sorted.sort((a, b) => a.price - b.price)
+        break
+      case "price-high":
+        sorted.sort((a, b) => b.price - a.price)
+        break
+      case "mileage-low":
+        sorted.sort((a, b) => a.mileage - b.mileage)
+        break
+    }
+    return sorted
+  }, [vehicles, searchTerm, brandFilter, sortBy])
+
+  // ---- paginación ----
+  const paginationData = useMemo(() => {
+    const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / vehiclesPerPage))
+    const safePage = Math.min(currentPage, totalPages)
+    const startIndex = (safePage - 1) * vehiclesPerPage
+    const endIndex = startIndex + vehiclesPerPage
+    const current = filteredVehicles.slice(startIndex, endIndex)
+    return { totalPages, startIndex, endIndex, current }
+  }, [filteredVehicles, currentPage, vehiclesPerPage])
+
+  // reset página si cambian filtros/búsqueda/sort
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, brandFilter, sortBy, vehiclesPerPage])
+
+  if (!user) return <div>Cargando...</div>
 
   if (loading) {
     return (
@@ -123,7 +185,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50/30 via-slate-50 to-slate-100">
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
           <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-lg shadow-sm">
@@ -167,39 +228,119 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <h2 className="text-xl font-semibold text-black">Gestión de Vehículos</h2>
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button
-              onClick={() => setShowForm(true)}
-              className="w-full sm:w-auto bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar Vehículo
-            </Button>
-          </div>
-        </div>
+        {/* Buscador + filtros (igual que público) */}
+        <Card className="mb-6 sm:mb-8 bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
+          <CardHeader className="pb-3 sm:pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl text-black">
+                Buscar
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="sm:hidden text-slate-600 hover:text-slate-800 hover:bg-slate-100"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                {showFilters ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+              </Button>
+            </div>
+          </CardHeader>
 
-        {/* Vehicle List */}
+          <CardContent className={`${showFilters ? "block" : "hidden"} sm:block`}>
+            <div className="flex flex-col gap-3">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 h-4 w-4" />
+                <Input
+                  placeholder="Buscar marca, modelo o año..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 border-slate-200 focus:border-slate-400 focus:ring-slate-400"
+                />
+              </div>
+
+              {/* Selectors side by side */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                {/* Marca */}
+                <Select value={brandFilter} onValueChange={setBrandFilter}>
+                  <SelectTrigger className="sm:w-48 border-slate-200">
+                    <SelectValue placeholder="Marca" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas las marcas</SelectItem>
+                    {brands.map((b) => (
+                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {/* Orden */}
+                <Select value={sortBy} onValueChange={(v: SortKey) => setSortBy(v)}>
+                  <SelectTrigger className="sm:w-56 border-slate-200">
+                    <SelectValue placeholder="Ordenar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Más nuevos</SelectItem>
+                    <SelectItem value="oldest">Más antiguos</SelectItem>
+                    <SelectItem value="price-low">Precio: menor a mayor</SelectItem>
+                    <SelectItem value="price-high">Precio: mayor a menor</SelectItem>
+                    <SelectItem value="mileage-low">Menor kilometraje</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* Botón agregar a mano derecha en desktop */}
+                <div className="sm:ml-auto">
+                  <Button
+                    onClick={() => setShowForm(true)}
+                    className="w-full sm:w-auto bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Agregar Vehículo
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Selector “mostrar N por página” */}
+        {filteredVehicles.length > 0 && (
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-sm text-slate-600">Mostrar:</span>
+            <Select value={vehiclesPerPage.toString()} onValueChange={(v) => setVehiclesPerPage(Number(v))}>
+              <SelectTrigger className="w-20">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">3</SelectItem>
+                <SelectItem value="6">6</SelectItem>
+                <SelectItem value="9">9</SelectItem>
+                <SelectItem value="12">12</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-slate-600">por página</span>
+          </div>
+        )}
+
+        {/* Lista */}
         <div className="grid gap-6">
-          {!Array.isArray(vehicles) || vehicles.length === 0 ? (
+          {filteredVehicles.length === 0 ? (
             <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
               <CardContent className="text-center py-12">
                 <Car className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                 <h3 className="text-lg sm:text-xl font-medium text-slate-900 mb-2">No hay vehículos</h3>
-                <p className="text-slate-600 mb-4">Comienza agregando tu primer vehículo al inventario.</p>
+                <p className="text-slate-600 mb-4">Agregá tu primer vehículo al inventario.</p>
                 <Button
                   onClick={() => setShowForm(true)}
                   className="bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Agregar Primer Vehículo
+                  Agregar Vehículo
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            vehicles.map((vehicle) => (
+            paginationData.current.map((vehicle) => (
               <Card
                 key={vehicle.id}
                 className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm hover:shadow-md transition-shadow"
@@ -223,7 +364,6 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Details */}
                     <div className="flex-1">
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
                         <div>
@@ -313,9 +453,57 @@ export default function AdminPage() {
             ))
           )}
         </div>
+
+        {/* Paginación */}
+        {filteredVehicles.length > 0 && paginationData.totalPages > 1 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between mt-8 gap-4">
+            <div className="text-sm text-slate-600">
+              Mostrando {paginationData.startIndex + 1} -{" "}
+              {Math.min(paginationData.endIndex, filteredVehicles.length)} de {filteredVehicles.length} vehículos
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="border-slate-300"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Anterior
+              </Button>
+
+              <div className="flex items-center gap-1">
+                {Array.from({ length: paginationData.totalPages }, (_, i) => i + 1).map((page) => (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 ${currentPage === page ? "bg-slate-800 text-white" : "border-slate-300 hover:bg-slate-50"}`}
+                  >
+                    {page}
+                  </Button>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(paginationData.totalPages, p + 1))}
+                disabled={currentPage === paginationData.totalPages}
+                className="border-slate-300"
+              >
+                Siguiente
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Vehicle Form Modal */}
+      {/* Modal */}
       {showForm && <VehicleForm vehicle={editingVehicle} onClose={handleFormClose} />}
     </div>
   )

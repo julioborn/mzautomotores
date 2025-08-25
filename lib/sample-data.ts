@@ -14,7 +14,7 @@ export const sampleVehicles: Omit<Vehicle, "id" | "createdAt" | "updatedAt">[] =
     description: "Excelente estado, un solo dueño, mantenimientos al día. Perfecto para uso diario.",
     images: [],
     contactName: "Carlos Mendoza",
-    contactPhone: "+1234567890",
+    contactPhone: "+3483529702",
     contactEmail: "carlos@automax.com",
     isPublic: true,
   },

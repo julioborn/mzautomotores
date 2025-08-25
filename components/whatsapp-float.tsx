@@ -12,7 +12,7 @@ export function WhatsAppFloat() {
     const defaultMessage = "Hola! Me gustaría obtener más información sobre los vehículos disponibles."
     const finalMessage = message || defaultMessage
     const encodedMessage = encodeURIComponent(finalMessage)
-    window.open(`https://wa.me/1234567890?text=${encodedMessage}`, "_blank")
+    window.open(`https://wa.me/3483529702?text=${encodedMessage}`, "_blank")
     setIsOpen(false)
   }
 
@@ -62,7 +62,7 @@ export function WhatsAppFloat() {
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Abrir WhatsApp
                 </Button>
-                <Button variant="outline" onClick={() => window.open("tel:+1234567890", "_blank")}>
+                <Button variant="outline" onClick={() => window.open("tel:+3483529702", "_blank")}>
                   <Phone className="h-4 w-4" />
                 </Button>
               </div>

@@ -31,7 +31,7 @@ Teléfono: ${formData.phone}
 Mensaje: ${formData.message}`
 
     const encodedMessage = encodeURIComponent(message)
-    window.open(`https://wa.me/1234567890?text=${encodedMessage}`, "_blank")
+    window.open(`https://wa.me/3483529702?text=${encodedMessage}`, "_blank")
   }
 
   return (
@@ -83,7 +83,7 @@ Mensaje: ${formData.message}`
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => setFormData((prev) => ({ ...prev, phone: e.target.value }))}
-                    placeholder="+1234567890"
+                    placeholder="+3483529702"
                   />
                 </div>
 
