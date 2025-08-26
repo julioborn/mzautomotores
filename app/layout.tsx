@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <SiteHeader />
           {/* Padding top para que el contenido no quede debajo del header sticky */}
-          <div className="pt-4 sm:pt-6">
+          <div className="">
             {children}
           </div>
         </AuthProvider>

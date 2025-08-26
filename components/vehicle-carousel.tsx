@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from "react"
 import type { Vehicle } from "@/types/vehicle"
-import { VehicleCard } from "@/components/vehicle-card"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import VehicleCard from "./vehicle-card"
 
 interface VehicleCarouselProps {
   vehicles: Vehicle[]

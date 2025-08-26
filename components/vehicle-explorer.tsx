@@ -10,12 +10,13 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Car, Search, MessageCircle, Menu, X, ChevronLeft, ChevronRight, Phone } from "lucide-react"
 import { VehicleCardProps } from "./vehicle-card"
+import Loader from "./ui/loader"
 
 type SortKey = "newest" | "oldest" | "price-low" | "price-high" | "mileage-low"
 
 const VehicleCard = dynamic<VehicleCardProps>(
     () => import("@/components/vehicle-card").then((m) => m.default),
-    { loading: () => <div className="h-64 rounded-lg bg-slate-100 animate-pulse" /> }
+    { loading: () => <Loader text="Cargando tarjeta..." minH="min-h-[16rem]" size="md" muted /> }
 )
 
 type Props = {
@@ -145,16 +146,8 @@ export function VehicleExplorer({ initialVehicles }: Props) {
         setSortBy("newest")
     }, [])
 
-    // ---------------- render ----------------
     if (loading) {
-        return (
-            <div className="flex items-center justify-center py-16">
-                <div className="text-center">
-                    <Car className="h-12 w-12 text-slate-600 mx-auto mb-4 animate-spin" />
-                    <p className="text-gray-600">Cargando vehículos...</p>
-                </div>
-            </div>
-        )
+        return <Loader text="Cargando vehículos..." />
     }
 
     if (error) {

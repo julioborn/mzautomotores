@@ -16,6 +16,7 @@ import { Car, Plus, LogOut, Eye, EyeOff, Edit, Trash2, Search, Menu, X, ChevronL
 import Link from "next/link"
 import Image from "next/image"
 import { VehicleForm } from "@/components/vehicle-form"
+import Loader from "@/components/ui/loader"
 
 type SortKey = "newest" | "oldest" | "price-low" | "price-high" | "mileage-low"
 
@@ -173,14 +174,7 @@ export default function AdminPage() {
   if (!user) return <div>Cargando...</div>
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50/30 via-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <Car className="h-12 w-12 text-slate-600 mx-auto mb-4 animate-pulse" />
-          <p className="text-slate-600">Cargando vehículos...</p>
-        </div>
-      </div>
-    )
+    return <Loader text="Cargando vehículos..." fullPage />
   }
 
   return (
@@ -292,7 +286,7 @@ export default function AdminPage() {
                 <div className="sm:ml-auto">
                   <Button
                     onClick={() => setShowForm(true)}
-                    className="w-full sm:w-auto bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600"
+                    className="w-full sm:w-auto bg-red-700 hover:bg-red-800 cursor-pointer"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Agregar Vehículo
@@ -332,7 +326,7 @@ export default function AdminPage() {
                 <p className="text-slate-600 mb-4">Agregá tu primer vehículo al inventario.</p>
                 <Button
                   onClick={() => setShowForm(true)}
-                  className="bg-gradient-to-r from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600"
+                  className="bg-gradient-to-r bg-red-700 hover:bg-red-800 cursor-pointer"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Agregar Vehículo
@@ -413,7 +407,7 @@ export default function AdminPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleTogglePublic(vehicle)}
-                          className="w-full sm:w-auto border-slate-200 text-slate-700 hover:bg-slate-50"
+                          className="w-full sm:w-auto border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                         >
                           {vehicle.isPublic ? (
                             <>
@@ -431,7 +425,7 @@ export default function AdminPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleEdit(vehicle)}
-                          className="w-full sm:w-auto border-slate-200 text-slate-700 hover:bg-slate-50"
+                          className="w-full sm:w-auto border-slate-200 text-slate-700 hover:bg-slate-50 cursor-pointer"
                         >
                           <Edit className="h-4 w-4 mr-2" />
                           Editar
@@ -440,7 +434,7 @@ export default function AdminPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleDelete(vehicle.id)}
-                          className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                          className="w-full sm:w-auto text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 cursor-pointer"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           Eliminar

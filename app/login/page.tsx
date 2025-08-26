@@ -45,7 +45,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br flex justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex pt-25 justify-center p-4">
       <div className="w-full max-w-md">
         
         {/* Header */}
@@ -102,11 +102,11 @@ export default function LoginPage() {
           </CardContent>
         </Card>
 
-        <div className="text-center mt-6">
+        {/* <div className="text-center mt-6">
           <Link href="/" className="rounded-md bg-white border p-2 text-red-700 hover:text-red-800 text-sm">
             ← Volver al inicio
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )

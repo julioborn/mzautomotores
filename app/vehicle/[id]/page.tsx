@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge"
 import { getVehicleById } from "@/lib/vehicles"
 import { DEALERSHIP_OWNER } from "@/lib/constants"
 import type { Vehicle } from "@/types/vehicle"
+import Loader from "@/components/ui/loader"
 
 export default function VehiclePage() {
   const params = useParams()
@@ -73,14 +74,7 @@ export default function VehiclePage() {
   }, [vehicle])
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50/30 via-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando vehículo...</p>
-        </div>
-      </div>
-    )
+    return <Loader text="Cargando vehículo..." />
   }
 
   if (!vehicle) {

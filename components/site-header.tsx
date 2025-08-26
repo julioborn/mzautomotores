@@ -83,8 +83,7 @@ export default function SiteHeader() {
                         {visibleItems.map((item) => (
                             <Link key={item.href} href={item.href} prefetch={true}>
                                 <Button
-                                    variant={isActive(item) ? "default" : "ghost"}
-                                    className={isActive(item) ? "bg-slate-900 text-white" : "text-slate-700 hover:text-slate-900"}
+                                    className="bg-black text-white hover:bg-black cursor-pointer"
                                     size="sm"
                                 >
                                     {item.icon && <span className="">{item.icon}</span>}
@@ -93,30 +92,29 @@ export default function SiteHeader() {
                             </Link>
                         ))}
 
-                        <Button onClick={handleWhatsApp} size="sm" className="bg-green-600 hover:bg-green-700">
-                            <MessageCircle className="h-4 w-4" />
-                            WhatsApp
-                        </Button>
-
                         {user ? (
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={handleLogout}
-                                className="border-slate-300 bg-red-700 text-white hover:bg-red-800 hover:text-white"
+                                className="border-slate-300 bg-red-700 text-white hover:bg-red-800 hover:text-white cursor-pointer"
                             >
                                 <LogOut className="h-4 w-4" />
-                                Cerrar sesión
+                                Cerrar Sesión
                             </Button>
                         ) : (
                             <Link href="/login" prefetch={true}>
-                                <Button size="sm" className="bg-slate-900 text-white hover:bg-slate-800">
+                                <Button size="sm" className="bg-black text-white hover:bg-black cursor-pointer">
                                     <User className="h-4 w-4" />
-                                    Iniciar sesión
+                                    Iniciar Sesión
                                 </Button>
                             </Link>
                         )}
 
+                        <Button onClick={handleWhatsApp} size="sm" className="bg-green-600 hover:bg-green-700 cursor-pointer">
+                            <MessageCircle className="h-4 w-4" />
+                            WhatsApp
+                        </Button>
                     </nav>
 
                     {/* Mobile menu */}
@@ -162,13 +160,13 @@ export default function SiteHeader() {
                                             className="justify-start border-slate-300 bg-red-700 text-white hover:bg-red-800 hover:text-white"
                                         >
                                             <LogOut className="h-4 w-4" />
-                                            Cerrar sesión
+                                            Cerrar Sesión
                                         </Button>
                                     ) : (
                                         <Link href="/login" onClick={() => setOpen(false)} prefetch={true}>
-                                            <Button className="w-full justify-start bg-slate-900 hover:bg-slate-800 text-white">
+                                            <Button className="w-full justify-start bg-black hover:bg-black text-white">
                                                 <User className="h-4 w-4 mr-2" />
-                                                Iniciar sesión
+                                                Iniciar Sesión
                                             </Button>
                                         </Link>
                                     )}
