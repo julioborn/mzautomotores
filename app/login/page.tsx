@@ -1,4 +1,3 @@
-// app/login/page.tsx
 "use client"
 
 import { useState } from "react"
@@ -25,7 +24,6 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
     setError("")
-
     try {
       const user = await authenticateUser(username, password)
       if (user) {
@@ -43,10 +41,9 @@ export default function LoginPage() {
 
   return (
     // No agregamos header aquí; ya lo pone app/layout.tsx
-    // Si en tu layout añadiste padding-top para el header (pt-20/pt-24), no lo repitas acá
-    <section className="min-h-[calc(100vh-5rem)] sm:min-h-[calc(100vh-6rem)] bg-gray-100 flex items-center justify-center px-4 py-8">
+    <section className="relative z-0 min-h-[calc(100vh-5rem)] sm:min-h-[calc(100vh-6rem)] bg-gray-100 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <Card className="shadow-sm">
+        <Card className="relative z-10 shadow-sm">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
@@ -58,7 +55,7 @@ export default function LoginPage() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
+            <form onSubmit={handleSubmit} className="space-y-4 pointer-events-auto" autoComplete="on">
               <div className="space-y-2">
                 <Label htmlFor="username">Usuario</Label>
                 <Input
@@ -75,7 +72,7 @@ export default function LoginPage() {
                   spellCheck={false}
                   inputMode="text"
                   enterKeyHint="next"
-                // Evita problemas de foco en PWA: tener el input en un contenedor no transformado y con overflow visible
+                  onTouchStart={(e) => e.currentTarget.focus()}
                 />
               </div>
 
@@ -94,6 +91,7 @@ export default function LoginPage() {
                   autoCorrect="off"
                   spellCheck={false}
                   enterKeyHint="go"
+                  onTouchStart={(e) => e.currentTarget.focus()}
                 />
               </div>
 
