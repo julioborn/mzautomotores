@@ -8,25 +8,36 @@ import { normalizeError } from "@/utils/errors"
 // GET
 export async function GET(request: NextRequest) {
   try {
-    await connectToDatabase()
+    await connectToDatabase();
 
-    const { searchParams } = new URL(request.url)
-    const publicOnly = searchParams.get("public") === "true"
+    const { searchParams } = new URL(request.url);
+    const publicOnly = searchParams.get("public") === "true";
+    const limit = Number(searchParams.get("limit") ?? 0); // 0 = sin límite
 
-    const query = publicOnly ? { isPublic: true } : {}
-    const vehicles = await Vehicle.find(query).sort({ createdAt: -1 })
+    const query = publicOnly ? { isPublic: true } : {};
 
-    const transformed = vehicles.map((v) => ({
-      ...v.toObject(),
+    const projection =
+      "brand model year price currency mileage fuelType transmission motor images isPublic showPrice createdAt";
+
+    const q = Vehicle.find(query, projection)
+      .sort({ createdAt: -1 })
+      .lean(); // objetos plain (más rápido)
+
+    if (limit > 0) q.limit(limit);
+
+    const vehicles = await q;
+
+    const transformed = vehicles.map((v: any) => ({
+      ...v,
       id: v._id.toString(),
       _id: undefined,
-    }))
+    }));
 
-    return NextResponse.json(transformed)
+    return NextResponse.json(transformed);
   } catch (err: unknown) {
-    const e = normalizeError(err)
-    console.error("Get vehicles error:", e)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    const e = normalizeError(err);
+    console.error("Get vehicles error:", e);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

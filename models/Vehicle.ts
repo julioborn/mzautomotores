@@ -82,4 +82,7 @@ const VehicleSchema = new mongoose.Schema(
   },
 )
 
+// al final del schema, antes de export
+VehicleSchema.index({ isPublic: 1, createdAt: -1 });
+
 export default mongoose.models.Vehicle || mongoose.model("Vehicle", VehicleSchema)
