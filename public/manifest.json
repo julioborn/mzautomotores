@@ -1,6 +1,6 @@
 {
   "name": "MZ Automotores",
-  "short_name": "MZ Auto",
+  "short_name": "MZ Automotores",
   "description": "Concesionaria de vehículos - Encuentra tu próximo auto",
   "start_url": "/",
   "display": "standalone",
