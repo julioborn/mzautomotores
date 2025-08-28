@@ -36,7 +36,7 @@ export function VehicleExplorer({ initialVehicles }: Props) {
     const [sortBy, setSortBy] = useState<SortKey>("newest")
     const [showFilters, setShowFilters] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
-    const [vehiclesPerPage, setVehiclesPerPage] = useState(6)
+    const [vehiclesPerPage, setVehiclesPerPage] = useState(3)
 
     // Debounce de búsqueda (200 ms) + defer para pintar antes y filtrar después
     const [debouncedSearch, setDebouncedSearch] = useState("")

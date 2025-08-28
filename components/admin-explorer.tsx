@@ -49,7 +49,7 @@ export function AdminExplorer({
     const [sortBy, setSortBy] = useState<SortKey>("newest")
     const [showFilters, setShowFilters] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
-    const [vehiclesPerPage, setVehiclesPerPage] = useState(6)
+    const [vehiclesPerPage, setVehiclesPerPage] = useState(3)
 
     // Si por algún motivo se llegó sin usuario (p. ej. logout desde otra pestaña)
     useEffect(() => {
