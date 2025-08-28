@@ -5,56 +5,86 @@ import { verifyToken } from "@/lib/jwt"
 import mongoose from "mongoose"
 import { normalizeError } from "@/utils/errors"
 
-// GET
+// GET (con paginado + payload chico opcional)
 export async function GET(request: NextRequest) {
   try {
     await connectToDatabase();
 
     const { searchParams } = new URL(request.url);
+
     const publicOnly = searchParams.get("public") === "true";
-    const limit = Number(searchParams.get("limit") ?? 0); // 0 = sin límite
+
+    // 🔢 paginado
+    const rawOffset = Number(searchParams.get("offset") ?? 0);
+    const rawLimit = Number(searchParams.get("limit") ?? 24);
+    const offset = Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0;
+    const limitCap = 100;
+    const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, limitCap) : 24;
+
+    // 🪶 modo liviano (solo primera imagen) → ideal para listados
+    const lightweight = searchParams.get("light") === "1" || searchParams.get("lightweight") === "1";
 
     const query = publicOnly ? { isPublic: true } : {};
 
-    // ✅ INCLUIR TODOS LOS CAMPOS QUE USA EL ADMIN
-    const projection =
-      [
-        "brand",
-        "model",
-        "year",
-        "price",
-        "currency",
-        "mileage",
-        "fuelType",
-        "transmission",
-        "motor",
-        "images",
-        "isPublic",
-        "showPrice",
-        "color",            // 👈
-        "description",      // (opcional, si lo mostrás/editás)
-        "contactName",      // 👈
-        "contactPhone",     // 👈
-        "contactEmail",     // 👈
-        "createdAt",
-        "updatedAt",
-      ].join(" ");
+    // 🧾 proyección: incluí solo lo que necesitás en el admin / público
+    const projection = [
+      "brand",
+      "model",
+      "year",
+      "price",
+      "currency",
+      "mileage",
+      "fuelType",
+      "transmission",
+      "motor",
+      "images",      // luego recortamos si light=1
+      "isPublic",
+      "showPrice",
+      "color",
+      "description",
+      "contactName",
+      "contactPhone",
+      "contactEmail",
+      "createdAt",
+      "updatedAt",
+    ].join(" ");
 
+    // 🏃 consulta con sort por createdAt, paginada
     const q = Vehicle.find(query, projection)
       .sort({ createdAt: -1 })
+      .skip(offset)
+      .limit(limit)
       .lean();
-
-    if (limit > 0) q.limit(limit);
 
     const vehicles = await q;
 
-    // ✅ map: id string, sin _id
+    // 🔢 hasMore calculando un siguiente elemento rápido
+    const nextQ = Vehicle.find(query, "_id")
+      .sort({ createdAt: -1 })
+      .skip(offset + limit)
+      .limit(1)
+      .lean();
+    const nextOne = await nextQ;
+    const hasMore = nextOne.length > 0;
+    const nextOffset = hasMore ? offset + limit : null;
+
+    // 🧼 map: id string y, si light, solo 1ra imagen
     const transformed = vehicles.map((v: any) => {
-      const { _id, ...rest } = v;
-      return { ...rest, id: String(_id) };
+      const { _id, images, ...rest } = v;
+      return {
+        ...rest,
+        id: String(_id),
+        images: lightweight
+          ? (Array.isArray(images) ? [images[0]].filter(Boolean) : [])
+          : (images ?? []),
+      };
     });
 
-    return NextResponse.json(transformed);
+    return NextResponse.json({
+      items: transformed,
+      hasMore,
+      nextOffset,
+    });
   } catch (err: unknown) {
     const e = normalizeError(err);
     console.error("Get vehicles error:", e);

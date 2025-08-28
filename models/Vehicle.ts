@@ -83,6 +83,11 @@ const VehicleSchema = new mongoose.Schema(
 )
 
 // al final del schema, antes de export
+// models/Vehicle.ts
+VehicleSchema.index({ createdAt: -1 });
 VehicleSchema.index({ isPublic: 1, createdAt: -1 });
+VehicleSchema.index({ brand: 1 });
+VehicleSchema.index({ fuelType: 1 });
+VehicleSchema.index({ transmission: 1 });
 
 export default mongoose.models.Vehicle || mongoose.model("Vehicle", VehicleSchema)
