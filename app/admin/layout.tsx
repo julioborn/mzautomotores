@@ -1,10 +1,7 @@
+// app/admin/layout.tsx
 import type React from "react"
-import { ProtectedRoute } from "@/components/protected-route"
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return <ProtectedRoute>{children}</ProtectedRoute>
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  // La protección ahora es SSR en app/admin/page.tsx → no duplicamos guardas en cliente
+  return children
 }

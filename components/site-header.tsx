@@ -61,6 +61,47 @@ export default function SiteHeader() {
         window.open(`https://wa.me/${phone}`, "_blank")
     }, [])
 
+    function MobileNavItem({
+        href,
+        icon,
+        active,
+        onSelect,
+        children,
+    }: {
+        href: string
+        icon?: React.ReactNode
+        active?: boolean
+        onSelect?: () => void
+        children: React.ReactNode
+    }) {
+        return (
+            <Link href={href} prefetch onClick={onSelect} aria-current={active ? "page" : undefined}>
+                <div
+                    className={[
+                        "relative w-full flex items-center gap-3 px-4 py-3 rounded transition-all shadow-sm mb-2", // 👈 AQUI EL CAMBIO
+                        active
+                            ? "bg-black text-white hover:bg-black"
+                            : "bg-white text-slate-900 border border-slate-200 hover:border-slate-300 hover:shadow-md",
+                    ].join(" ")}
+                >
+                    <span
+                        className={[
+                            "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+                            active ? "bg-black/20" : "bg-slate-900/5",
+                        ].join(" ")}
+                    >
+                        <span className={active ? "text-white" : "text-slate-700"}>
+                            {icon}
+                        </span>
+                    </span>
+                    <span className={`font-medium ${active ? "text-white" : "text-slate-900"}`}>
+                        {children}
+                    </span>
+                </div>
+            </Link>
+        )
+    }
+
     return (
         <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -125,56 +166,103 @@ export default function SiteHeader() {
                                     <Menu className="h-6 w-6" />
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-80">
-                                <SheetHeader>
-                                    <SheetTitle className="flex items-center gap-3">
-                                        <Image src="/images/mzlogo.png" alt="MZ Automotores" width={36} height={36} />
-                                        MZ Automotores
-                                    </SheetTitle>
+
+                            <SheetContent
+                                side="right"
+                                className="
+    w-[88vw] max-w-sm p-0 overflow-hidden
+    bg-gradient-to-b from-white to-slate-50
+    border-l border-slate-200
+    pb-[env(safe-area-inset-bottom)]
+    "
+                            >
+                                {/* ✅ Header con Title accesible */}
+                                <SheetHeader className="sr-only">
+                                    <SheetTitle>Menú de navegación</SheetTitle>
                                 </SheetHeader>
 
-                                <div className="mt-6 flex flex-col gap-2">
+                                {/* Header del sheet */}
+                                <div className="flex items-center gap-3 px-4 pt-4 pb-3 border-b border-slate-200/70 bg-white/80 backdrop-blur">
+                                    <Image src="/images/mzlogo.png" alt="MZ Automotores" width={32} height={32} />
+                                    <div className="font-semibold">MZ Automotores</div>
+                                </div>
+
+                                {/* Navegación */}
+                                <nav className="px-4 py-4 space-y-2">
                                     {visibleItems.map((item) => (
-                                        <Link key={item.href} href={item.href} onClick={() => setOpen(false)} prefetch={true}>
-                                            <Button
-                                                variant={isActive(item) ? "default" : "ghost"}
-                                                className="w-full justify-start"
-                                            >
-                                                {item.icon && <span className="mr-2">{item.icon}</span>}
-                                                {item.label}
-                                            </Button>
-                                        </Link>
+                                        <MobileNavItem
+                                            key={item.href}
+                                            href={item.href}
+                                            icon={item.icon}
+                                            active={isActive(item)}
+                                            onSelect={() => setOpen(false)}
+                                        >
+                                            {item.label}
+                                        </MobileNavItem>
                                     ))}
 
-                                    <Separator className="my-2" />
+                                    {/* CTA WhatsApp */}
+                                    <button
+                                        onClick={() => { handleWhatsApp(); setOpen(false); }}
+                                        className="
+            w-full flex items-center gap-3 px-4 py-3
+            rounded border border-emerald-200 bg-white
+            shadow-sm hover:shadow-md
+            outline-none ring-0 hover:border-emerald-300
+            transition-all
+            "
+                                    >
+                                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600/10">
+                                            <MessageCircle className="h-4 w-4 text-emerald-700" />
+                                        </span>
+                                        <span className="font-medium text-slate-900">WhatsApp</span>
+                                    </button>
 
-                                    <Button onClick={handleWhatsApp} className="w-full justify-start bg-green-600 hover:bg-green-700">
-                                        <MessageCircle className="h-4 w-4 mr-2" />
-                                        WhatsApp
-                                    </Button>
+                                    {/* Login / Logout */}
                                     {user ? (
-                                        <Button
-                                            variant="outline"
-                                            size="lg"
-                                            onClick={handleLogout}
-                                            className="justify-start border-slate-300 bg-red-700 text-white hover:bg-red-800 hover:text-white"
+                                        <button
+                                            onClick={() => { handleLogout(); setOpen(false); }}
+                                            className="
+            w-full flex items-center gap-3 px-4 py-3
+            rounded border border-red-200 bg-white
+            shadow-sm hover:shadow-md
+            outline-none ring-0 hover:border-red-300
+            transition-all
+            "
                                         >
-                                            <LogOut className="h-4 w-4" />
-                                            Cerrar Sesión
-                                        </Button>
+                                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-600/10">
+                                                <LogOut className="h-4 w-4 text-red-700" />
+                                            </span>
+                                            <span className="font-medium text-red-700">Cerrar Sesión</span>
+                                        </button>
                                     ) : (
-                                        <Link href="/login" onClick={() => setOpen(false)} prefetch={true}>
-                                            <Button className="w-full justify-start bg-black hover:bg-black text-white">
-                                                <User className="h-4 w-4 mr-2" />
-                                                Iniciar Sesión
-                                            </Button>
+                                        <Link href="/login" prefetch onClick={() => setOpen(false)}>
+                                            <div
+                                                className="
+                w-full flex items-center gap-3 px-4 py-3
+                rounded border border-slate-200 bg-white
+                shadow-sm hover:shadow-md
+                outline-none ring-0 hover:border-slate-300
+                transition-all
+              "
+                                            >
+                                                <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900/10">
+                                                    <User className="h-4 w-4 text-slate-900" />
+                                                </span>
+                                                <span className="font-medium text-slate-900">Iniciar Sesión</span>
+                                            </div>
                                         </Link>
                                     )}
+                                </nav>
 
+                                {/* Footer mini */}
+                                <div className="mt-2 px-4 pb-4 text-xs text-slate-500">
+                                    © {new Date().getFullYear()} MZ Automotores
                                 </div>
                             </SheetContent>
                         </Sheet>
                     </div>
+
                 </div>
             </div>
         </header>
