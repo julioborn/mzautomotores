@@ -16,22 +16,43 @@ export async function GET(request: NextRequest) {
 
     const query = publicOnly ? { isPublic: true } : {};
 
+    // ✅ INCLUIR TODOS LOS CAMPOS QUE USA EL ADMIN
     const projection =
-      "brand model year price currency mileage fuelType transmission motor images isPublic showPrice createdAt";
+      [
+        "brand",
+        "model",
+        "year",
+        "price",
+        "currency",
+        "mileage",
+        "fuelType",
+        "transmission",
+        "motor",
+        "images",
+        "isPublic",
+        "showPrice",
+        "color",            // 👈
+        "description",      // (opcional, si lo mostrás/editás)
+        "contactName",      // 👈
+        "contactPhone",     // 👈
+        "contactEmail",     // 👈
+        "createdAt",
+        "updatedAt",
+      ].join(" ");
 
     const q = Vehicle.find(query, projection)
       .sort({ createdAt: -1 })
-      .lean(); // objetos plain (más rápido)
+      .lean();
 
     if (limit > 0) q.limit(limit);
 
     const vehicles = await q;
 
-    const transformed = vehicles.map((v: any) => ({
-      ...v,
-      id: v._id.toString(),
-      _id: undefined,
-    }));
+    // ✅ map: id string, sin _id
+    const transformed = vehicles.map((v: any) => {
+      const { _id, ...rest } = v;
+      return { ...rest, id: String(_id) };
+    });
 
     return NextResponse.json(transformed);
   } catch (err: unknown) {
