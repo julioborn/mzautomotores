@@ -123,3 +123,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.route-login .fixed,
+.route-login [data-radix-portal] {
+  display: none !important;
+}

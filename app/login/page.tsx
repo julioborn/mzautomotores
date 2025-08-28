@@ -40,22 +40,19 @@ export default function LoginPage() {
   }
 
   return (
-    // No agregamos header aquí; ya lo pone app/layout.tsx
-    <section className="relative z-0 min-h-[calc(100vh-5rem)] sm:min-h-[calc(100vh-6rem)] bg-gray-100 flex items-center justify-center px-4 py-8">
+    <section className="relative min-h-[calc(100vh-5rem)] sm:min-h-[calc(100vh-6rem)] bg-gray-100 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <Card className="relative z-10 shadow-sm">
+        <Card className="relative z-[60] shadow-sm"> {/* z alto para estar por encima de cualquier sticky/overlay */}
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="h-5 w-5" />
               Iniciar Sesión
             </CardTitle>
-            <CardDescription>
-              Ingresa tus credenciales para acceder al panel de administración
-            </CardDescription>
+            <CardDescription>Ingresa tus credenciales para acceder al panel de administración</CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4 pointer-events-auto" autoComplete="on">
+            <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
               <div className="space-y-2">
                 <Label htmlFor="username">Usuario</Label>
                 <Input
@@ -72,7 +69,8 @@ export default function LoginPage() {
                   spellCheck={false}
                   inputMode="text"
                   enterKeyHint="next"
-                  onTouchStart={(e) => e.currentTarget.focus()}
+                  autoFocus
+                  onTouchStart={(e) => e.currentTarget.focus()} // iOS PWA friendly
                 />
               </div>
 
@@ -91,7 +89,7 @@ export default function LoginPage() {
                   autoCorrect="off"
                   spellCheck={false}
                   enterKeyHint="go"
-                  onTouchStart={(e) => e.currentTarget.focus()}
+                  onTouchStart={(e) => e.currentTarget.focus()} // iOS PWA friendly
                 />
               </div>
 

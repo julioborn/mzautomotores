@@ -4,15 +4,16 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/auth-context"
-import SiteHeader from "@/components/site-header" // ⬅️ nuevo header común
+import SiteHeader from "@/components/site-header"
+import RouteBodyClass from "@/components/route-body-class"
 
 export const metadata: Metadata = {
   title: "MZ Automotores",
   description: "Concesionaria de vehículos - Encuentra tu próximo auto, motos y más",
-  generator: "v0.app",
   manifest: "/manifest.json",
   themeColor: "#dc2626",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+  // Evitar maximum-scale/user-scalable=no (rompe foco en iOS PWA)
+  viewport: "width=device-width, initial-scale=1",
   appleWebApp: { capable: true, statusBarStyle: "default", title: "MZ Automotores" },
   icons: { icon: "/images/mzlogo.png", apple: "/images/mzlogo.png" },
 }
@@ -36,14 +37,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
+      {/* RouteBodyClass pone bodyClass="route-login" cuando pathname === "/login" */}
       <body className="antialiased">
-        <AuthProvider>
-          <SiteHeader />
-          {/* Padding top para que el contenido no quede debajo del header sticky */}
-          <div className="">
-            {children}
-          </div>
-        </AuthProvider>
+        <RouteBodyClass>
+          <AuthProvider>
+            <SiteHeader />
+            <div>{children}</div>
+          </AuthProvider>
+        </RouteBodyClass>
       </body>
     </html>
   )
