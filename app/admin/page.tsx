@@ -21,7 +21,9 @@ export default async function AdminPage() {
   const projection = [
     "brand", "model", "year", "price", "currency",
     "mileage", "fuelType", "transmission",
-    "color", "images", "isPublic", "createdAt"
+    "motor", "color",                 // 👈 traer motor
+    "contactName", "contactPhone", "contactEmail", // 👈 traer contacto
+    "images", "isPublic", "createdAt"
   ].join(" ")
 
   // ⚠️ Paginemos en SSR (p. ej. 24 ítems)

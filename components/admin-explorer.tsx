@@ -407,15 +407,18 @@ export function AdminExplorer({
                                                     <p className="font-medium text-slate-800">{vehicle.transmission}</p>
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm text-slate-600">Color</p>
-                                                    <p className="font-medium text-slate-800">{vehicle.color}</p>
+                                                    <p className="text-sm text-slate-600">Motor</p>
+                                                    <p className="font-medium text-slate-800">{vehicle.motor}</p>
                                                 </div>
                                             </div>
 
                                             <div className="mb-4">
                                                 <p className="text-sm text-slate-600 mb-1">Contacto</p>
                                                 <p className="font-medium text-slate-800">
-                                                    {vehicle.contactName} - {vehicle.contactPhone}
+                                                    {vehicle.contactName}
+                                                </p>
+                                                <p className="font-medium text-slate-800">
+                                                    {vehicle.contactPhone}
                                                 </p>
                                             </div>
 
