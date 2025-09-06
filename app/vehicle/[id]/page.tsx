@@ -1,53 +1,34 @@
-// app/vehicles/[id]/page.tsx
-import mongoose from "mongoose";
+// app/vehicle/[id]/page.tsx
 import { notFound } from "next/navigation";
+import { unstable_cache } from "next/cache";
+import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import Vehicle from "@/models/Vehicle";
 import VehicleClient from "./vehicle-client";
 
 type VehicleLean = {
   _id: mongoose.Types.ObjectId;
-  brand: string;
-  model: string;
-  year: number;
-  price: number;
+  brand: string; model: string; year: number; price: number;
   currency?: "ARS" | "USD";
-  mileage: number;
-  fuelType: string;
-  transmission: string;
-  motor?: string;
-  color?: string;
-  images: string[];
-  showPrice?: boolean;
-  description?: string;
-  contactName?: string;
-  contactPhone?: string;
-  contactEmail?: string;
+  mileage: number; fuelType: string; transmission: string;
+  motor?: string; color?: string; images: string[];
+  showPrice?: boolean; description?: string;
+  contactName?: string; contactPhone?: string; contactEmail?: string;
   createdAt?: Date;
 };
 
 type VehiclePlain = {
   id: string;
-  brand: string;
-  model: string;
-  year: number;
-  price: number;
+  brand: string; model: string; year: number; price: number;
   currency?: "ARS" | "USD";
-  mileage: number;
-  fuelType: string;
-  transmission: string;
-  motor?: string | null;
-  color?: string | null;
-  images: string[];
-  showPrice?: boolean;
-  description?: string | null;
-  contactName?: string | null;
-  contactPhone?: string | null;
-  contactEmail?: string | null;
-  createdAt?: string | null; // ISO string
+  mileage: number; fuelType: string; transmission: string;
+  motor?: string | null; color?: string | null; images: string[];
+  showPrice?: boolean; description?: string | null;
+  contactName?: string | null; contactPhone?: string | null; contactEmail?: string | null;
+  createdAt?: string | null;
 };
 
-function serializeVehicle(doc: VehicleLean): VehiclePlain {
+function serialize(doc: VehicleLean): VehiclePlain {
   return {
     id: String(doc._id),
     brand: doc.brand,
@@ -70,22 +51,28 @@ function serializeVehicle(doc: VehicleLean): VehiclePlain {
   };
 }
 
+// 👇 keyParts debe ser un array *estático*.
+// Los argumentos (id) van a la función devuelta.
+const getVehicleCached = unstable_cache(
+  async (id: string) => {
+    await connectToDatabase();
+    const projection = [
+      "brand", "model", "year", "price", "currency",
+      "mileage", "fuelType", "transmission", "motor", "color",
+      "images", "showPrice", "description",
+      "contactName", "contactPhone", "contactEmail", "createdAt",
+    ].join(" ");
+
+    const doc = await Vehicle.findById(id, projection).lean<VehicleLean | null>();
+    return doc ? serialize(doc) : null;
+  },
+  ["vehicle-by-id"],                  // ✅ keyParts fijas
+  { revalidate: 60, tags: ["vehicles"] }
+);
+
 export default async function VehiclePage({ params }: { params: { id: string } }) {
-  await connectToDatabase();
-
-  const projection = [
-    "brand", "model", "year", "price", "currency",
-    "mileage", "fuelType", "transmission", "motor", "color",
-    "images", "showPrice", "description",
-    "contactName", "contactPhone", "contactEmail",
-    "createdAt",
-  ].join(" ");
-
-  // 👇 Tipá lean() para evitar uniones raras
-  const doc = await Vehicle.findById(params.id, projection).lean<VehicleLean | null>();
-  if (!doc) return notFound();
-
-  const vehicle = serializeVehicle(doc); // 🔴 ahora es 100% “plain object”
+  const vehicle = await getVehicleCached(params.id);
+  if (!vehicle) return notFound();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50/30 via-slate-50 to-slate-100">

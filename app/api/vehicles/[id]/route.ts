@@ -1,96 +1,70 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { connectToDatabase } from "@/lib/mongodb"
-import Vehicle from "@/models/Vehicle"
-import { verifyToken } from "@/lib/jwt"
+// app/api/vehicle/[id]/route.ts
+import { type NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
+import Vehicle from "@/models/Vehicle";
+import { verifyToken } from "@/lib/jwt";
+import mongoose from "mongoose";
+import { revalidateTag } from "next/cache";
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+type VehicleLean = {
+  _id: mongoose.Types.ObjectId;
+  // 🔽 incluí los campos que devolvés
+  brand: string; model: string; year: number; price: number;
+  currency?: "ARS" | "USD";
+  mileage: number; fuelType: string; transmission: string;
+  motor?: string; color?: string; images: string[];
+  showPrice?: boolean; description?: string;
+  contactName?: string; contactPhone?: string; contactEmail?: string;
+  isPublic?: boolean;
+  createdAt?: Date; updatedAt?: Date;
+};
+
+export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await connectToDatabase()
-
-    const { id } = await params
-    const vehicle = await Vehicle.findById(id)
-
-    if (!vehicle) {
-      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 })
-    }
-
-    // Only return public vehicles
-    if (!vehicle.isPublic) {
-      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 })
-    }
-
-    const transformedVehicle = {
-      ...vehicle.toObject(),
-      id: vehicle._id.toString(),
-      _id: undefined,
-    }
-
-    return NextResponse.json(transformedVehicle)
-  } catch (error) {
-    console.error("Get vehicle error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    await connectToDatabase();
+    const v = await Vehicle.findById(params.id).lean<VehicleLean | null>();
+    if (!v || !v.isPublic) return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
+    const { _id, ...rest } = v;
+    return NextResponse.json({ ...rest, id: String(_id) });
+  } catch (e) {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const token = request.cookies.get("token")?.value
-    if (!token) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
-    }
+    const token = req.cookies.get("token")?.value;
+    if (!token || !verifyToken(token)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const decoded = verifyToken(token)
-    if (!decoded) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 })
-    }
+    await connectToDatabase();
+    const updates = await req.json();
 
-    await connectToDatabase()
+    const v = await Vehicle
+      .findByIdAndUpdate(params.id, updates, { new: true, runValidators: true })
+      .lean<VehicleLean | null>();                 // ✅ tipado correcto
 
-    const updates = await request.json()
-    const { id } = await params
-    const vehicle = await Vehicle.findByIdAndUpdate(id, updates, { new: true, runValidators: true })
+    if (!v) return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
 
-    if (!vehicle) {
-      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 })
-    }
-
-    const transformedVehicle = {
-      ...vehicle.toObject(),
-      id: vehicle._id.toString(),
-      _id: undefined,
-    }
-
-    return NextResponse.json(transformedVehicle)
-  } catch (error) {
-    console.error("Update vehicle error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    const { _id, ...rest } = v;                   // ✅ ahora _id existe
+    revalidateTag("vehicles");
+    return NextResponse.json({ ...rest, id: String(_id) });
+  } catch (e) {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const token = request.cookies.get("token")?.value
-    if (!token) {
-      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
-    }
+    const token = req.cookies.get("token")?.value;
+    if (!token || !verifyToken(token)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const decoded = verifyToken(token)
-    if (!decoded) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 })
-    }
+    await connectToDatabase();
+    const v = await Vehicle.findByIdAndDelete(params.id);
+    if (!v) return NextResponse.json({ error: "Vehicle not found" }, { status: 404 });
 
-    await connectToDatabase()
-
-    const { id } = await params
-    const vehicle = await Vehicle.findByIdAndDelete(id)
-
-    if (!vehicle) {
-      return NextResponse.json({ error: "Vehicle not found" }, { status: 404 })
-    }
-
-    return NextResponse.json({ message: "Vehicle deleted successfully" })
-  } catch (error) {
-    console.error("Delete vehicle error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    revalidateTag("vehicles");
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
