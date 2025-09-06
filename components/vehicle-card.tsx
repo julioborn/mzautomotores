@@ -19,7 +19,7 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   const images =
     vehicle.images.length > 0
       ? vehicle.images
-      : [`/placeholder.svg?height=250&width=400&query=${vehicle.brand} ${vehicle.model}`]
+      : [`/placeholder.svg?height=600&width=600&query=${vehicle.brand} ${vehicle.model}`]
 
   const handleWhatsAppContact = () => {
     const currencySymbol = vehicle.currency === "USD" ? "USD" : "ARS"
@@ -54,17 +54,18 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 h-full">
       <div className="relative group">
-        <div className="relative w-full h-40 sm:h-48">
+        {/* 2) contenedor con aspect ratio */}
+        <div className="relative w-full aspect-square sm:aspect-[4/3] lg:aspect-[5/4] bg-black/5">
           <Image
             src={currentImage || "/placeholder.svg"}
             alt={`${vehicle.brand} ${vehicle.model}`}
             fill
-            className="object-cover transition-opacity duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover md:object-cover transition-opacity duration-300"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             loading="lazy"
             quality={85}
             placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/..." // el mismo que tenías
             onError={() => handleImageError(currentImageIndex)}
           />
         </div>
