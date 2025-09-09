@@ -4,9 +4,10 @@ import type { Vehicle } from "@/types/vehicle"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { X, MessageCircle, Fuel, Gauge, Settings, Zap } from "lucide-react"
+import { X, MessageCircle, Fuel, Gauge, Settings } from "lucide-react"
 import { useState } from "react"
 import { DEALERSHIP_OWNER } from "@/lib/constants"
+import { Engine } from "@phosphor-icons/react"
 
 interface VehicleDetailModalProps {
   vehicle: Vehicle
@@ -106,7 +107,7 @@ Detalles del vehículo:
               </div>
             </div>
             <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-              <Zap className="h-5 w-5 text-orange-600" />
+              <Engine className="h-5 w-5 text-orange-600" />
               <div>
                 <p className="text-sm text-gray-600">Motor</p>
                 <p className="font-semibold">{vehicle.motor}</p>

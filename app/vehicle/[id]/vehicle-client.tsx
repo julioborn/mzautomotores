@@ -2,7 +2,8 @@
 
 import { useMemo, useState, useCallback } from "react"
 import Image from "next/image"
-import { ChevronLeft, ChevronRight, Gauge, Fuel, Settings, Zap, Calendar, Palette, MessageCircle } from "lucide-react"
+import { ChevronLeft, ChevronRight, Gauge, Fuel, Settings, Calendar, Palette, MessageCircle } from "lucide-react"
+import { Engine } from "@phosphor-icons/react";
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -123,7 +124,11 @@ export default function VehicleClient({ vehicle }: { vehicle: Vehicle }) {
                                 <Spec icon={<Gauge className="h-5 w-5 text-slate-600" />} label="Kilometraje" value={`${vehicle.mileage.toLocaleString()} km`} />
                                 <Spec icon={<Fuel className="h-5 w-5 text-slate-600" />} label="Combustible" value={vehicle.fuelType} />
                                 <Spec icon={<Settings className="h-5 w-5 text-slate-600" />} label="Transmisión" value={vehicle.transmission} />
-                                <Spec icon={<Zap className="h-5 w-5 text-slate-600" />} label="Motor" value={vehicle.motor || "—"} />
+                                <Spec
+                                    icon={<Engine className="h-5 w-5 text-slate-600" weight="bold" />}
+                                    label="Motor"
+                                    value={vehicle.motor || "—"}
+                                />
                                 <Spec icon={<Calendar className="h-5 w-5 text-slate-600" />} label="Año" value={String(vehicle.year)} />
                                 <Spec icon={<Palette className="h-5 w-5 text-slate-600" />} label="Color" value={vehicle.color || "—"} />
                             </div>

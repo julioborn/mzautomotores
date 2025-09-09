@@ -6,9 +6,10 @@ import type { Vehicle } from "@/types/vehicle"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Gauge, Settings, Fuel, Zap, MessageCircle } from "lucide-react"
+import { ChevronLeft, ChevronRight, Gauge, Settings, Fuel, MessageCircle } from "lucide-react"
 import { useState } from "react"
 import { DEALERSHIP_OWNER } from "@/lib/constants"
+import { Engine } from "@phosphor-icons/react"
 
 export type VehicleCardProps = { vehicle: Vehicle }
 
@@ -137,7 +138,10 @@ export default function VehicleCard({ vehicle }: VehicleCardProps) {
             <span>{vehicle.fuelType}</span>
           </div>
           <div className="flex items-center gap-1 text-gray-600">
-            <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
+            <Engine
+              className="h-3 w-3 sm:h-4 sm:w-4"
+              weight="bold" // 👈 esto lo hace más grueso
+            />
             <span>{vehicle.motor}</span>
           </div>
         </div>
