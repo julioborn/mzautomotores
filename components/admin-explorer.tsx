@@ -154,10 +154,16 @@ export function AdminExplorer({
         const sorted = [...filtered]
         switch (sortBy) {
             case "newest":
-                sorted.sort((a, b) => b.year - a.year)
+                sorted.sort(
+                    (a, b) =>
+                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+                )
                 break
             case "oldest":
-                sorted.sort((a, b) => a.year - b.year)
+                sorted.sort(
+                    (a, b) =>
+                        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                )
                 break
             case "price-low":
                 sorted.sort((a, b) => a.price - b.price)

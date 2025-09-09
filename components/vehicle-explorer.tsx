@@ -63,8 +63,12 @@ export function VehicleExplorer({ initialVehicles }: Props) {
     }, [])
 
     useEffect(() => {
-        if (!initialVehicles) fetchVehicles()
-    }, [fetchVehicles, initialVehicles])
+        // Siempre refrescá al montar (stale-while-repaint rápido)
+        fetchVehicles()
+        // opcional: re-poll cada 30s por si dejás abierta la página
+        // const id = setInterval(fetchVehicles, 30000)
+        // return () => clearInterval(id)
+    }, [fetchVehicles])
 
     // ---------------- normalización (una sola vez por cambio de data) ----------------
     const normalized = useMemo(() => {

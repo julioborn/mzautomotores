@@ -21,12 +21,12 @@ export async function GET(request: NextRequest) {
     const limitCap = 100;
     const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, limitCap) : 24;
 
-    // 🪶 modo liviano (solo primera imagen) → ideal para listados
+    // 🪶 modo liviano (solo primera imagen)
     const lightweight = searchParams.get("light") === "1" || searchParams.get("lightweight") === "1";
 
     const query = publicOnly ? { isPublic: true } : {};
 
-    // 🧾 proyección: incluí solo lo que necesitás en el admin / público
+    // 🧾 proyección
     const projection = [
       "brand",
       "model",
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       "fuelType",
       "transmission",
       "motor",
-      "images",      // luego recortamos si light=1
+      "images",
       "isPublic",
       "showPrice",
       "color",
@@ -49,27 +49,24 @@ export async function GET(request: NextRequest) {
       "updatedAt",
     ].join(" ");
 
-    // 🏃 consulta con sort por createdAt, paginada
-    const q = Vehicle.find(query, projection)
+    // 🏃 consulta principal
+    const vehicles = await Vehicle.find(query, projection)
       .sort({ createdAt: -1 })
       .skip(offset)
       .limit(limit)
       .lean();
 
-    const vehicles = await q;
-
-    // 🔢 hasMore calculando un siguiente elemento rápido
-    const nextQ = Vehicle.find(query, "_id")
+    // 🔢 hasMore
+    const nextOne = await Vehicle.find(query, "_id")
       .sort({ createdAt: -1 })
       .skip(offset + limit)
       .limit(1)
       .lean();
-    const nextOne = await nextQ;
     const hasMore = nextOne.length > 0;
     const nextOffset = hasMore ? offset + limit : null;
 
-    // 🧼 map: id string y, si light, solo 1ra imagen
-    const transformed = vehicles.map((v: any) => {
+    // 🧼 transformación (id plano + light images)
+    const items = vehicles.map((v: any) => {
       const { _id, images, ...rest } = v;
       return {
         ...rest,
@@ -80,15 +77,30 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({
-      items: transformed,
-      hasMore,
-      nextOffset,
-    });
+    return NextResponse.json(
+      { items, hasMore, nextOffset },
+      {
+        headers: {
+          // 🚫 sin caché en ningún lado
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+          "Surrogate-Control": "no-store",
+        },
+      }
+    );
   } catch (err: unknown) {
     const e = normalizeError(err);
     console.error("Get vehicles error:", e);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      }
+    );
   }
 }
 

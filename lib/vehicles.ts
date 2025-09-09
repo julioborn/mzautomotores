@@ -2,14 +2,18 @@ import type { Vehicle } from "@/types/vehicle"
 
 export const getVehicles = async (): Promise<Vehicle[]> => {
   try {
-    const response = await fetch("/api/vehicles")
-    if (!response.ok) throw new Error("Failed to fetch vehicles")
-    return await response.json()
+    const response = await fetch("/api/vehicles", {
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Failed to fetch vehicles");
+
+    const data = await response.json();
+    return data.items ?? []; // ✅ lo mismo aquí
   } catch (error) {
-    console.error("Error fetching vehicles:", error)
-    return []
+    console.error("Error fetching vehicles:", error);
+    return [];
   }
-}
+};
 
 export const addVehicle = async (vehicle: Omit<Vehicle, "id" | "createdAt" | "updatedAt">): Promise<Vehicle | null> => {
   try {
@@ -78,14 +82,18 @@ export const deleteVehicle = async (id: string): Promise<boolean> => {
 
 export const getPublicVehicles = async (): Promise<Vehicle[]> => {
   try {
-    const response = await fetch("/api/vehicles?public=true")
-    if (!response.ok) throw new Error("Failed to fetch public vehicles")
-    return await response.json()
+    const response = await fetch("/api/vehicles?public=true", {
+      cache: "no-store",
+    });
+    if (!response.ok) throw new Error("Failed to fetch public vehicles");
+
+    const data = await response.json();
+    return data.items ?? []; // ✅ importante: devolver items
   } catch (error) {
-    console.error("Error fetching public vehicles:", error)
-    return []
+    console.error("Error fetching public vehicles:", error);
+    return [];
   }
-}
+};
 
 export const getVehicleById = async (id: string): Promise<Vehicle | null> => {
   try {

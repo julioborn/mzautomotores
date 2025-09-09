@@ -229,11 +229,13 @@ export function VehicleForm({ vehicle, onClose }: VehicleFormProps) {
     setDraggedIndex(null)
   }
 
-  const handleTouchStart = (e: React.TouchEvent, index: number) => {
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>, index: number) => {
     setDraggedIndex(index)
-    e.currentTarget.style.opacity = "0.7"
-    e.currentTarget.style.transform = "scale(1.02)"
-    e.currentTarget.style.zIndex = "10"
+
+    const target = e.currentTarget as HTMLElement
+    target.style.opacity = "0.7"
+    target.style.transform = "scale(1.02)"
+    target.style.zIndex = "10"
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -250,10 +252,11 @@ export function VehicleForm({ vehicle, onClose }: VehicleFormProps) {
     }
   }
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    e.currentTarget.style.opacity = "1"
-    e.currentTarget.style.transform = "scale(1)"
-    e.currentTarget.style.zIndex = "auto"
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    const target = e.currentTarget as HTMLElement
+    target.style.opacity = "1"
+    target.style.transform = "scale(1)"
+    target.style.zIndex = "auto"
 
     if (draggedIndex === null) return
 
@@ -493,7 +496,7 @@ export function VehicleForm({ vehicle, onClose }: VehicleFormProps) {
                     onDrop={(e) => handleDrop(e, index)}
                     onTouchStart={(e) => handleTouchStart(e, index)}
                     onTouchMove={handleTouchMove}
-                    onTouchEnd={(e) => handleTouchEnd(e, index)}
+                    onTouchEnd={(e) => handleTouchEnd(e)}
                     style={{ touchAction: "none" }}
                   >
                     <div className="flex items-center justify-between mb-2">

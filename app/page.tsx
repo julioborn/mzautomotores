@@ -1,4 +1,8 @@
-// app/page.tsx  (⚠️ quita "use client")
+// app/page.tsx
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 import { connectToDatabase } from "@/lib/mongodb";
 import Vehicle from "@/models/Vehicle";
 import { VehicleExplorer } from "@/components/vehicle-explorer";
@@ -10,7 +14,7 @@ export default async function HomePage() {
     "brand model year price currency mileage fuelType transmission motor images isPublic showPrice createdAt";
   const raw = await Vehicle.find({ isPublic: true }, projection)
     .sort({ createdAt: -1 })
-    .limit(12)       // pinta rápido (puedes subir o bajar)
+    .limit(12)
     .lean();
 
   const initialVehicles = raw.map((v: any) => ({
