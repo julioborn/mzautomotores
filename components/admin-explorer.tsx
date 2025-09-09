@@ -322,7 +322,10 @@ export function AdminExplorer({
                 {filteredVehicles.length > 0 && (
                     <div className="flex items-center gap-2 mb-6">
                         <span className="text-sm text-slate-600">Mostrar:</span>
-                        <Select value={vehiclesPerPage.toString()} onValueChange={(v) => setVehiclesPerPage(Number(v))}>
+                        <Select
+                            value={vehiclesPerPage.toString()}
+                            onValueChange={(v: string) => setVehiclesPerPage(Number(v))}
+                        >
                             <SelectTrigger className="w-20">
                                 <SelectValue />
                             </SelectTrigger>

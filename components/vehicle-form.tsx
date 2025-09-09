@@ -591,7 +591,9 @@ export function VehicleForm({ vehicle, onClose }: VehicleFormProps) {
               <Switch
                 id="isPublic"
                 checked={formData.isPublic}
-                onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, isPublic: checked }))}
+                onCheckedChange={(checked: boolean) =>
+                  setFormData((prev) => ({ ...prev, isPublic: checked }))
+                }
               />
               <Label htmlFor="isPublic">Mostrar públicamente</Label>
             </div>
@@ -601,7 +603,9 @@ export function VehicleForm({ vehicle, onClose }: VehicleFormProps) {
               <Switch
                 id="showPrice"
                 checked={formData.showPrice}
-                onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, showPrice: checked }))}
+                onCheckedChange={(checked: boolean) =>
+                  setFormData((prev) => ({ ...prev, showPrice: checked }))
+                }
               />
               <Label htmlFor="showPrice">Mostrar precio al público</Label>
             </div>
