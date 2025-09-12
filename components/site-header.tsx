@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { MessageCircle, Menu, LogOut, Shield, Home } from "lucide-react"
+import { MessageCircle, Menu, LogOut, Shield, Home, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { DEALERSHIP_OWNER } from "@/lib/constants"
 
@@ -58,64 +58,40 @@ export default function SiteHeader() {
         window.open(`https://wa.me/${phone}`, "_blank")
     }, [])
 
-    function MobileNavItem({
-        href,
-        icon,
-        active,
-        onSelect,
-        children,
-    }: {
-        href: string
-        icon?: React.ReactNode
-        active?: boolean
-        onSelect?: () => void
-        children: React.ReactNode
-    }) {
-        return (
-            <Link href={href} prefetch onClick={onSelect} aria-current={active ? "page" : undefined}>
-                <div
-                    className={[
-                        "relative w-full flex items-center gap-3 px-4 py-3 rounded transition-all shadow-sm mb-2",
-                        active
-                            ? "bg-black text-white hover:bg-black"
-                            : "bg-white text-slate-900 border border-slate-200 hover:border-slate-300 hover:shadow-md",
-                    ].join(" ")}
-                >
-                    <span
-                        className={[
-                            "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
-                            active ? "bg-black/20" : "bg-slate-900/5",
-                        ].join(" ")}
-                    >
-                        <span className={active ? "text-white" : "text-slate-700"}>{icon}</span>
-                    </span>
-                    <span className={`font-medium ${active ? "text-white" : "text-slate-900"}`}>
-                        {children}
-                    </span>
-                </div>
-            </Link>
-        )
-    }
-
     return (
         <header className="sticky top-0 z-40 bg-white border-b border-slate-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="h-20 sm:h-24 flex items-center justify-between">
-                    {/* Brand */}
-                    <Link href="/" className="flex items-center gap-3">
-                        <Image
-                            src="/images/mzlogo.png"
-                            alt="MZ Automotores"
-                            width={290}
-                            height={72}
-                            className="h-16 sm:h-22 w-auto transition-all duration-300"
-                            priority
-                        />
-                        <span className="sr-only">Ir a inicio</span>
-                    </Link>
+                <div className="h-20 sm:h-24 flex items-center justify-between relative">
+                    {/* Botón Back */}
+                    <div className="absolute left-0 flex items-center">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => router.back()}
+                            aria-label="Volver"
+                            className="cursor-pointer"
+                        >
+                            <ArrowLeft className="h-8 w-8 text-black" />
+                        </Button>
+                    </div>
+
+                    {/* Logo centrado */}
+                    <div className="flex-1 flex justify-center">
+                        <Link href="/" className="flex items-center gap-3">
+                            <Image
+                                src="/images/mzlogo.png"
+                                alt="MZ Automotores"
+                                width={290}
+                                height={72}
+                                className="h-16 sm:h-22 w-auto transition-all duration-300"
+                                priority
+                            />
+                            <span className="sr-only">Ir a inicio</span>
+                        </Link>
+                    </div>
 
                     {/* Desktop nav */}
-                    <nav className="hidden md:flex items-center gap-2">
+                    <nav className="hidden md:flex items-center gap-2 absolute right-0">
                         {visibleItems.map((item) => (
                             <Link key={item.href} href={item.href} prefetch={true}>
                                 <Button
@@ -128,7 +104,7 @@ export default function SiteHeader() {
                             </Link>
                         ))}
 
-                        {/* ✅ Solo aparece Cerrar Sesión si hay user */}
+                        {/* Solo aparece Cerrar Sesión si hay user */}
                         {user && (
                             <Button
                                 variant="outline"
@@ -152,7 +128,7 @@ export default function SiteHeader() {
                     </nav>
 
                     {/* Mobile menu */}
-                    <div className="md:hidden">
+                    <div className="md:hidden absolute right-0">
                         <Sheet open={open} onOpenChange={setOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="ghost" size="icon" aria-label="Abrir menú">
@@ -172,21 +148,18 @@ export default function SiteHeader() {
 
                                 <nav className="px-4 py-4 space-y-2">
                                     {visibleItems.map((item) => (
-                                        <MobileNavItem
-                                            key={item.href}
-                                            href={item.href}
-                                            icon={item.icon}
-                                            active={isActive(item)}
-                                            onSelect={() => setOpen(false)}
-                                        >
-                                            {item.label}
-                                        </MobileNavItem>
+                                        <Link key={item.href} href={item.href} prefetch onClick={() => setOpen(false)}>
+                                            <div className="w-full flex items-center gap-3 px-4 py-3 rounded border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all">
+                                                {item.icon && <span>{item.icon}</span>}
+                                                <span className="font-medium text-slate-900">{item.label}</span>
+                                            </div>
+                                        </Link>
                                     ))}
 
                                     {/* WhatsApp */}
                                     <button
                                         onClick={() => { handleWhatsApp(); setOpen(false); }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 rounded border border-emerald-200 bg-white shadow-sm hover:shadow-md outline-none ring-0 hover:border-emerald-300 transition-all"
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded border border-emerald-200 bg-white shadow-sm hover:shadow-md transition-all"
                                     >
                                         <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600/10">
                                             <MessageCircle className="h-4 w-4 text-emerald-700" />
@@ -194,11 +167,11 @@ export default function SiteHeader() {
                                         <span className="font-medium text-slate-900">WhatsApp</span>
                                     </button>
 
-                                    {/* ✅ Solo Cerrar Sesión si hay user */}
+                                    {/* Cerrar Sesión solo si hay user */}
                                     {user && (
                                         <button
                                             onClick={() => { handleLogout(); setOpen(false); }}
-                                            className="w-full flex items-center gap-3 px-4 py-3 rounded border border-red-200 bg-white shadow-sm hover:shadow-md outline-none ring-0 hover:border-red-300 transition-all"
+                                            className="w-full flex items-center gap-3 px-4 py-3 rounded border border-red-200 bg-white shadow-sm hover:shadow-md transition-all"
                                         >
                                             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-600/10">
                                                 <LogOut className="h-4 w-4 text-red-700" />
